@@ -146,12 +146,12 @@
     <div class="card-body">
       <p><strong>Formato esperado do arquivo:</strong></p>
       <ul>
-        <li>Linha 1: número de vértices (ex: 5)</li>
-        <li>Linhas seguintes: cada uma com dois inteiros (u, v) representando uma aresta</li>
+        <li>Linha 1: número de vértices (ex: 7)</li>
+        <li>Linhas seguintes: cada linha com dois nomes representando uma aresta (ex: "São Paulo" "Rio de Janeiro")</li>
       </ul>
       <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
-          <label for="arquivo_grafo" class="form-label">Selecione o arquivo:</label>
+          <label for="arquivo_grafo" class="form-label">Selecione o arquivo do grafo:</label>
           <input type="file" 
                  name="arquivo_grafo" 
                  id="arquivo_grafo"

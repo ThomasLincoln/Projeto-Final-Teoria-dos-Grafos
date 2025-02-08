@@ -10,6 +10,8 @@ app = Flask(__name__)
 app.secret_key = "chave-secreta-qualquer"
 
 grafo_atual = None  # variável global que armazena a instância atual do Grafo
+mapa_vertices = {}  # mapeia nomes para IDs
+mapa_reverso = {}  # mapeia IDs para nomes
 
 @app.route("/", methods=["GET"])
 def index():
@@ -21,25 +23,53 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    global grafo_atual, mapa_vertices, mapa_reverso
+    
     if "arquivo_grafo" not in request.files:
-        flash("Nenhum arquivo enviado", "danger")
+        flash("Nenhum arquivo de grafo enviado", "danger")
         return redirect(url_for("index"))
     
     arquivo = request.files["arquivo_grafo"]
     if arquivo.filename == "":
-        flash("Nenhum arquivo selecionado", "danger")
+        flash("Nenhum arquivo de grafo selecionado", "danger")
         return redirect(url_for("index"))
     
     try:
         conteudo = arquivo.read().decode("utf-8").splitlines()
         num_vertices = int(conteudo[0])
+        
+        # Reset dos mapeamentos
+        mapa_vertices = {}
+        mapa_reverso = {}
+        vertices_unicos = set()
+        
+        # Primeira passagem: coletar todos os nomes únicos de vértices
+        for linha in conteudo[1:]:
+            # Divide a linha em dois nomes, removendo aspas extras se existirem
+            v1, v2 = [nome.strip().strip('"') for nome in linha.split('"') if nome.strip()]
+            vertices_unicos.add(v1)
+            vertices_unicos.add(v2)
+        
+        # Verifica se o número de vértices corresponde
+        if len(vertices_unicos) != num_vertices:
+            flash(f"Número de vértices declarado ({num_vertices}) não corresponde ao número de vértices únicos encontrados ({len(vertices_unicos)})", "danger")
+            return redirect(url_for("index"))
+        
+        # Cria mapeamento de nomes para IDs
+        for idx, nome in enumerate(sorted(vertices_unicos)):
+            mapa_vertices[nome] = idx
+            mapa_reverso[idx] = nome
+        
+        # Cria o grafo
         grafo = Grafo(num_vertices)
         
-        for i, linha in enumerate(conteudo[1:], start=1):
-            u, v = map(int, linha.split())
+        # Segunda passagem: adicionar arestas usando os IDs mapeados
+        for linha in conteudo[1:]:
+            v1, v2 = [nome.strip().strip('"') for nome in linha.split('"') if nome.strip()]
+            u = mapa_vertices[v1]
+            v = mapa_vertices[v2]
             grafo.adicionar_aresta(u, v)
             
-        global grafo_atual
         grafo_atual = grafo
         
         # Criar visualização
@@ -47,18 +77,20 @@ def upload():
         
         # Adicionar nós
         for node_id in range(num_vertices):
-            net.add_node(node_id, label=str(node_id), color="#79C2EC")
+            nome = mapa_reverso[node_id]
+            net.add_node(node_id, label=nome, color="#79C2EC", title=nome)
             
         # Adicionar arestas com labels alfabéticas
         for i, (u, v) in enumerate(grafo.arestas):
             label = chr(65 + i)  # Converte 0->A, 1->B, 2->C, etc.
             net.add_edge(u, v, label=label)
             
-        # Opções de visualização incluindo labels nas arestas
+        # Opções de visualização
         net.set_options("""
         var options = {
           "nodes": {
             "font": {
+              "size": 16,
               "color": "rgba(0,0,0,1)"
             }
           },
@@ -78,7 +110,7 @@ def upload():
         return redirect(url_for("index"))
         
     except Exception as e:
-        flash(f"Erro ao processar arquivo: {str(e)}", "danger")
+        flash(f"Erro ao processar arquivo do grafo: {str(e)}", "danger")
         return redirect(url_for("index"))
 
 @app.route("/gerar_arvore", methods=["POST"])

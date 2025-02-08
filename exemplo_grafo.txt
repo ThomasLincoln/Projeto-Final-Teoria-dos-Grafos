@@ -1,0 +1,10 @@
+7
+"São Paulo" "Rio de Janeiro"
+"São Paulo" "Belo Horizonte"
+"Rio de Janeiro" "Vitória"
+"Rio de Janeiro" "Salvador"
+"Belo Horizonte" "Brasília"
+"Belo Horizonte" "Goiânia"
+"Rio de Janeiro" "Brasília"
+"Vitória" "Goiânia"
+"Salvador" "Brasília" 
