@@ -205,6 +205,22 @@
                 <button type="submit" class="btn btn-light">Menor Corte</button>
             </form>
         </div>
+        <div class="btn-group m-1">
+            <form action="{{ url_for('buscar_ciclo') }}" method="POST" class="d-inline-block">
+                <div class="input-group">
+                    <input type="number" 
+                           name="tamanho_ciclo" 
+                           class="form-control form-control-sm" 
+                           value="3" 
+                           min="3" 
+                           style="width: 70px;"
+                           title="Tamanho do ciclo">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-light">Buscar Ciclo</button>
+                    </div>
+                </div>
+            </form>
+        </div>
       </div>
     </div>
     <div class="card-body p-0">

@@ -784,6 +784,89 @@ def calcular_info_grafo(grafo):
         'diametro': diametro
     }
 
+@app.route("/buscar_ciclo", methods=["POST"])
+def buscar_ciclo():
+    global grafo_atual
+    if not grafo_atual:
+        flash("Carregue um grafo primeiro!", "warning")
+        return redirect(url_for("index"))
+    
+    try:
+        tamanho = int(request.form.get('tamanho_ciclo', 3))
+        if tamanho < 3:
+            flash("O tamanho do ciclo deve ser pelo menos 3!", "warning")
+            return redirect(url_for("index"))
+            
+        ciclo = encontrar_ciclo(grafo_atual, tamanho)
+        
+        if ciclo:
+            # Criar nova visualização destacando o ciclo
+            net = configurar_network()
+            
+            # Adicionar todos os nós
+            for node_id in range(grafo_atual.vertices):
+                nome = mapa_reverso[node_id]
+                if node_id in ciclo:
+                    # Nós do ciclo em destaque
+                    net.add_node(node_id, label=nome, color="#ff7f50", title=nome)
+                else:
+                    net.add_node(node_id, label=nome, color="#79C2EC", title=nome)
+            
+            # Adicionar todas as arestas
+            for i, (u, v) in enumerate(grafo_atual.arestas):
+                if u in ciclo and v in ciclo and abs(ciclo.index(u) - ciclo.index(v)) in [1, len(ciclo)-1]:
+                    # Arestas do ciclo em destaque
+                    net.add_edge(u, v, color="#ff7f50", width=3)
+                else:
+                    net.add_edge(u, v, color="#323232")
+            
+            salvar_visualizacao(net)
+            
+            # Criar mensagem com os vértices do ciclo
+            vertices_ciclo = [mapa_reverso[v] for v in ciclo]
+            flash(f"Ciclo de tamanho {tamanho} encontrado: {' -> '.join(vertices_ciclo)}", "success")
+        else:
+            flash(f"Não foi encontrado nenhum ciclo de tamanho {tamanho}!", "warning")
+            
+        return redirect(url_for("index"))
+        
+    except Exception as e:
+        flash(f"Erro ao buscar ciclo: {str(e)}", "danger")
+        return redirect(url_for("index"))
+
+def encontrar_ciclo(grafo, tamanho):
+    """
+    Encontra um ciclo de tamanho específico no grafo usando busca em profundidade
+    """
+    def dfs_ciclo(atual, inicio, caminho, visitados):
+        if len(caminho) == tamanho:
+            # Verifica se forma um ciclo voltando ao início
+            if inicio in grafo.lista_adjacencia[atual]:
+                return caminho
+            return None
+            
+        for vizinho in grafo.lista_adjacencia[atual]:
+            if vizinho not in visitados:
+                novo_caminho = dfs_ciclo(vizinho, inicio, caminho + [vizinho], visitados | {vizinho})
+                if novo_caminho:
+                    return novo_caminho
+        return None
+    
+    # Gera lista de adjacência se não existir
+    if not hasattr(grafo, 'lista_adjacencia'):
+        grafo.lista_adjacencia = [[] for _ in range(grafo.vertices)]
+        for u, v in grafo.arestas:
+            grafo.lista_adjacencia[u].append(v)
+            grafo.lista_adjacencia[v].append(u)
+    
+    # Tenta encontrar ciclo começando de cada vértice
+    for v in range(grafo.vertices):
+        ciclo = dfs_ciclo(v, v, [v], {v})
+        if ciclo:
+            return ciclo
+            
+    return None
+
 # Configuração para o Render
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 10000))

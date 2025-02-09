@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 800px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#ff7f50", "id": 0, "label": "APAE Cacapava", "shape": "dot", "title": "APAE Cacapava"}, {"color": "#ff7f50", "id": 1, "label": "CE Prof Edison de Freitas Ramalho", "shape": "dot", "title": "CE Prof Edison de Freitas Ramalho"}, {"color": "#79C2EC", "id": 2, "label": "CE SESI", "shape": "dot", "title": "CE SESI"}, {"color": "#79C2EC", "id": 3, "label": "Colegio Cecilia Cacapava", "shape": "dot", "title": "Colegio Cecilia Cacapava"}, {"color": "#ff7f50", "id": 4, "label": "Colegio Comercial Cacapava", "shape": "dot", "title": "Colegio Comercial Cacapava"}, {"color": "#79C2EC", "id": 5, "label": "Colegio Galileu de Cacapava", "shape": "dot", "title": "Colegio Galileu de Cacapava"}, {"color": "#79C2EC", "id": 6, "label": "Colegio Jardim Alvorada", "shape": "dot", "title": "Colegio Jardim Alvorada"}, {"color": "#79C2EC", "id": 7, "label": "Colegio O Mensageiro", "shape": "dot", "title": "Colegio O Mensageiro"}, {"color": "#79C2EC", "id": 8, "label": "Colegio Olivia Alegri", "shape": "dot", "title": "Colegio Olivia Alegri"}, {"color": "#79C2EC", "id": 9, "label": "Colegio Progressao", "shape": "dot", "title": "Colegio Progressao"}, {"color": "#ff7f50", "id": 10, "label": "Colegio Sao Francisco de Assis", "shape": "dot", "title": "Colegio Sao Francisco de Assis"}, {"color": "#79C2EC", "id": 11, "label": "Colegio VespeR Renascenca", "shape": "dot", "title": "Colegio VespeR Renascenca"}, {"color": "#79C2EC", "id": 12, "label": "EE Arrecieres Natai", "shape": "dot", "title": "EE Arrecieres Natai"}, {"color": "#79C2EC", "id": 13, "label": "EE Luciana Damas Bezerra", "shape": "dot", "title": "EE Luciana Damas Bezerra"}, {"color": "#ff7f50", "id": 14, "label": "EE Ministro Jose de Moura Resende", "shape": "dot", "title": "EE Ministro Jose de Moura Resende"}, {"color": "#79C2EC", "id": 15, "label": "EE Pereira de Mattos", "shape": "dot", "title": "EE Pereira de Mattos"}, {"color": "#79C2EC", "id": 16, "label": "EE Profa Margarida Maia de Almeida Vieira", "shape": "dot", "title": "EE Profa Margarida Maia de Almeida Vieira"}, {"color": "#79C2EC", "id": 17, "label": "EE Professora Joao Goncalves Barbosa", "shape": "dot", "title": "EE Professora Joao Goncalves Barbosa"}, {"color": "#ff7f50", "id": 18, "label": "EEI Nosso Amiguinho", "shape": "dot", "title": "EEI Nosso Amiguinho"}, {"color": "#79C2EC", "id": 19, "label": "EEPG Prof Roque Passareli", "shape": "dot", "title": "EEPG Prof Roque Passareli"}, {"color": "#79C2EC", "id": 20, "label": "EM Aurora Paes da Costa", "shape": "dot", "title": "EM Aurora Paes da Costa"}, {"color": "#79C2EC", "id": 21, "label": "EM Daphne Cesar Ghidella", "shape": "dot", "title": "EM Daphne Cesar Ghidella"}, {"color": "#79C2EC", "id": 22, "label": "EM Eliel de Almeira Martins", "shape": "dot", "title": "EM Eliel de Almeira Martins"}, {"color": "#79C2EC", "id": 23, "label": "EM Prof Aluisio Franca Barbosa", "shape": "dot", "title": "EM Prof Aluisio Franca Barbosa"}, {"color": "#ff7f50", "id": 24, "label": "EM Prof Zelia de Souza Madureira", "shape": "dot", "title": "EM Prof Zelia de Souza Madureira"}, {"color": "#79C2EC", "id": 25, "label": "EMEF Dr Antonio Pereira Bueno", "shape": "dot", "title": "EMEF Dr Antonio Pereira Bueno"}, {"color": "#79C2EC", "id": 26, "label": "EMEF Dr. Raif Mafuz", "shape": "dot", "title": "EMEF Dr. Raif Mafuz"}, {"color": "#79C2EC", "id": 27, "label": "EMEF Edmir Viana de Moura", "shape": "dot", "title": "EMEF Edmir Viana de Moura"}, {"color": "#79C2EC", "id": 28, "label": "EMEF Prof. Fernando Pantaleao", "shape": "dot", "title": "EMEF Prof. Fernando Pantaleao"}, {"color": "#79C2EC", "id": 29, "label": "EMEF Profa Geny Farah Salles", "shape": "dot", "title": "EMEF Profa Geny Farah Salles"}, {"color": "#79C2EC", "id": 30, "label": "EMEF Profa Zelia de Castro Marques", "shape": "dot", "title": "EMEF Profa Zelia de Castro Marques"}, {"color": "#79C2EC", "id": 31, "label": "EMEI Joaquim Raphael de Araujo Filho", "shape": "dot", "title": "EMEI Joaquim Raphael de Araujo Filho"}, {"color": "#79C2EC", "id": 32, "label": "EMEI Maria Jose de Siqueira Lara", "shape": "dot", "title": "EMEI Maria Jose de Siqueira Lara"}, {"color": "#79C2EC", "id": 33, "label": "EMEI Profa Lourdes Araujo Juliano", "shape": "dot", "title": "EMEI Profa Lourdes Araujo Juliano"}, {"color": "#79C2EC", "id": 34, "label": "EMEIPI Padre Jose Benedito A. Monteiro", "shape": "dot", "title": "EMEIPI Padre Jose Benedito A. Monteiro"}, {"color": "#79C2EC", "id": 35, "label": "ETEC Machado de Assis", "shape": "dot", "title": "ETEC Machado de Assis"}, {"color": "#79C2EC", "id": 36, "label": "Escola Francisca Moura Luz Pereira", "shape": "dot", "title": "Escola Francisca Moura Luz Pereira"}, {"color": "#ff7f50", "id": 37, "label": "Escola Prof Lindolpho Machado", "shape": "dot", "title": "Escola Prof Lindolpho Machado"}, {"color": "#79C2EC", "id": 38, "label": "Escola Profa Maria Aparecida Franca Barbosa de Araujo", "shape": "dot", "title": "Escola Profa Maria Aparecida Franca Barbosa de Araujo"}, {"color": "#79C2EC", "id": 39, "label": "Escola Ruth de Sa", "shape": "dot", "title": "Escola Ruth de Sa"}, {"color": "#79C2EC", "id": 40, "label": "Faculdade Santo Antonio Cacapava", "shape": "dot", "title": "Faculdade Santo Antonio Cacapava"}, {"color": "#ff7f50", "id": 41, "label": "NE Risco Magico", "shape": "dot", "title": "NE Risco Magico"}, {"color": "#ff7f50", "id": 42, "label": "Objetivo Cacapava", "shape": "dot", "title": "Objetivo Cacapava"}, {"color": "#79C2EC", "id": 43, "label": "Projeto Portal Tijuco Preto", "shape": "dot", "title": "Projeto Portal Tijuco Preto"}, {"color": "#79C2EC", "id": 44, "label": "SESI Cacapava", "shape": "dot", "title": "SESI Cacapava"}]);
+                  edges = new vis.DataSet([{"color": "#323232", "from": 29, "to": 12}, {"color": "#323232", "from": 29, "to": 6}, {"color": "#323232", "from": 12, "to": 6}, {"color": "#323232", "from": 12, "to": 16}, {"color": "#323232", "from": 13, "to": 16}, {"color": "#323232", "from": 13, "to": 31}, {"color": "#323232", "from": 13, "to": 23}, {"color": "#323232", "from": 31, "to": 16}, {"color": "#323232", "from": 31, "to": 23}, {"color": "#323232", "from": 31, "to": 6}, {"color": "#323232", "from": 31, "to": 1}, {"color": "#323232", "from": 16, "to": 1}, {"color": "#ff7f50", "from": 1, "to": 24, "width": 3}, {"color": "#ff7f50", "from": 1, "to": 18, "width": 3}, {"color": "#323232", "from": 1, "to": 14}, {"color": "#323232", "from": 1, "to": 41}, {"color": "#323232", "from": 1, "to": 37}, {"color": "#323232", "from": 24, "to": 18}, {"color": "#323232", "from": 24, "to": 14}, {"color": "#323232", "from": 24, "to": 41}, {"color": "#323232", "from": 24, "to": 37}, {"color": "#323232", "from": 24, "to": 10}, {"color": "#323232", "from": 24, "to": 8}, {"color": "#323232", "from": 24, "to": 5}, {"color": "#323232", "from": 24, "to": 9}, {"color": "#323232", "from": 24, "to": 3}, {"color": "#323232", "from": 24, "to": 35}, {"color": "#323232", "from": 24, "to": 19}, {"color": "#ff7f50", "from": 24, "to": 0, "width": 3}, {"color": "#ff7f50", "from": 18, "to": 14, "width": 3}, {"color": "#323232", "from": 18, "to": 41}, {"color": "#323232", "from": 18, "to": 37}, {"color": "#323232", "from": 18, "to": 10}, {"color": "#323232", "from": 18, "to": 8}, {"color": "#323232", "from": 18, "to": 5}, {"color": "#323232", "from": 18, "to": 35}, {"color": "#323232", "from": 18, "to": 19}, {"color": "#323232", "from": 18, "to": 0}, {"color": "#ff7f50", "from": 14, "to": 41, "width": 3}, {"color": "#323232", "from": 14, "to": 37}, {"color": "#323232", "from": 14, "to": 10}, {"color": "#323232", "from": 14, "to": 8}, {"color": "#323232", "from": 14, "to": 5}, {"color": "#323232", "from": 14, "to": 19}, {"color": "#323232", "from": 14, "to": 0}, {"color": "#323232", "from": 14, "to": 3}, {"color": "#323232", "from": 10, "to": 3}, {"color": "#ff7f50", "from": 10, "to": 41, "width": 3}, {"color": "#ff7f50", "from": 10, "to": 37, "width": 3}, {"color": "#323232", "from": 10, "to": 8}, {"color": "#323232", "from": 10, "to": 5}, {"color": "#323232", "from": 10, "to": 35}, {"color": "#323232", "from": 10, "to": 0}, {"color": "#323232", "from": 10, "to": 19}, {"color": "#323232", "from": 10, "to": 40}, {"color": "#323232", "from": 10, "to": 11}, {"color": "#323232", "from": 41, "to": 37}, {"color": "#323232", "from": 41, "to": 8}, {"color": "#ff7f50", "from": 37, "to": 42, "width": 3}, {"color": "#323232", "from": 37, "to": 20}, {"color": "#323232", "from": 37, "to": 11}, {"color": "#323232", "from": 0, "to": 19}, {"color": "#323232", "from": 0, "to": 40}, {"color": "#323232", "from": 0, "to": 9}, {"color": "#ff7f50", "from": 0, "to": 4, "width": 3}, {"color": "#323232", "from": 0, "to": 7}, {"color": "#323232", "from": 0, "to": 42}, {"color": "#323232", "from": 0, "to": 20}, {"color": "#323232", "from": 0, "to": 11}, {"color": "#323232", "from": 19, "to": 40}, {"color": "#323232", "from": 19, "to": 9}, {"color": "#323232", "from": 19, "to": 4}, {"color": "#323232", "from": 19, "to": 7}, {"color": "#323232", "from": 19, "to": 20}, {"color": "#323232", "from": 19, "to": 11}, {"color": "#323232", "from": 40, "to": 9}, {"color": "#323232", "from": 40, "to": 4}, {"color": "#323232", "from": 40, "to": 7}, {"color": "#323232", "from": 40, "to": 20}, {"color": "#323232", "from": 40, "to": 11}, {"color": "#323232", "from": 9, "to": 4}, {"color": "#323232", "from": 9, "to": 7}, {"color": "#323232", "from": 9, "to": 11}, {"color": "#323232", "from": 9, "to": 20}, {"color": "#323232", "from": 11, "to": 35}, {"color": "#323232", "from": 35, "to": 40}, {"color": "#323232", "from": 27, "to": 32}, {"color": "#323232", "from": 27, "to": 25}, {"color": "#323232", "from": 27, "to": 2}, {"color": "#323232", "from": 27, "to": 34}, {"color": "#323232", "from": 27, "to": 42}, {"color": "#323232", "from": 27, "to": 7}, {"color": "#323232", "from": 32, "to": 25}, {"color": "#323232", "from": 32, "to": 2}, {"color": "#323232", "from": 27, "to": 21}, {"color": "#323232", "from": 32, "to": 34}, {"color": "#323232", "from": 32, "to": 21}, {"color": "#323232", "from": 32, "to": 7}, {"color": "#323232", "from": 25, "to": 2}, {"color": "#323232", "from": 25, "to": 34}, {"color": "#323232", "from": 25, "to": 21}, {"color": "#323232", "from": 25, "to": 7}, {"color": "#323232", "from": 2, "to": 34}, {"color": "#323232", "from": 2, "to": 21}, {"color": "#323232", "from": 2, "to": 7}, {"color": "#323232", "from": 34, "to": 21}, {"color": "#323232", "from": 21, "to": 7}, {"color": "#ff7f50", "from": 4, "to": 42, "width": 3}, {"color": "#323232", "from": 17, "to": 40}, {"color": "#323232", "from": 17, "to": 4}, {"color": "#323232", "from": 17, "to": 20}, {"color": "#323232", "from": 17, "to": 7}, {"color": "#323232", "from": 15, "to": 5}, {"color": "#323232", "from": 17, "to": 5}, {"color": "#323232", "from": 15, "to": 25}, {"color": "#323232", "from": 15, "to": 2}, {"color": "#323232", "from": 15, "to": 32}, {"color": "#323232", "from": 36, "to": 26}, {"color": "#323232", "from": 44, "to": 39}, {"color": "#323232", "from": 30, "to": 38}, {"color": "#323232", "from": 33, "to": 39}, {"color": "#323232", "from": 33, "to": 44}, {"color": "#323232", "from": 28, "to": 39}, {"color": "#323232", "from": 28, "to": 43}, {"color": "#323232", "from": 38, "to": 35}, {"color": "#323232", "from": 26, "to": 25}, {"color": "#323232", "from": 22, "to": 33}, {"color": "#323232", "from": 22, "to": 39}, {"color": "#323232", "from": 22, "to": 44}, {"color": "#323232", "from": 44, "to": 11}, {"color": "#323232", "from": 44, "to": 7}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"nodes": {"font": {"size": 12}}, "edges": {"font": {"size": 12}}, "physics": {"enabled": true, "stabilization": true}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
