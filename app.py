@@ -57,17 +57,13 @@ def salvar_visualizacao(net, is_tree_view=False):
         print(f"Erro ao salvar visualização: {e}")
         return False
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
-    """
-    Rota principal que renderiza a página inicial
-    """
-    graph_filename = session.get('graph_filename')
-    
+    global grafo_atual
     return render_template(
         "index.html",
-        graph_filename=graph_filename,
-        is_tree_view=session.get('is_tree_view', False)
+        graph_filename=session.get('graph_filename'),
+        grafo_atual=grafo_atual
     )
 
 @app.route("/upload", methods=["POST"])
@@ -692,6 +688,57 @@ def encontrar_corte_especifico():
     except Exception as e:
         flash(f"Erro ao encontrar corte: {str(e)}", "danger")
         return redirect(url_for("index"))
+
+def calcular_info_grafo(grafo):
+    """
+    Calcula informações gerais sobre o grafo
+    """
+    if not grafo:
+        return None
+        
+    # Lista de adjacência para cálculos
+    lista_adj = grafo.gerar_lista_adjacencia()
+    
+    # Calcular graus
+    graus = {}
+    for v in range(grafo.vertices):
+        graus[v] = len(lista_adj[v])
+    
+    # Encontrar maior e menor grau
+    maior_grau = max(graus.values()) if graus else 0
+    menor_grau = min(graus.values()) if graus else 0
+    
+    # Encontrar vértices de maior e menor grau
+    vertices_maior_grau = [mapa_reverso[v] for v, g in graus.items() if g == maior_grau]
+    vertices_menor_grau = [mapa_reverso[v] for v, g in graus.items() if g == menor_grau]
+    
+    # Verificar se é conexo usando BFS
+    def eh_conexo():
+        if grafo.vertices == 0:
+            return True
+            
+        visitados = set()
+        fila = [0]
+        visitados.add(0)
+        
+        while fila:
+            v = fila.pop(0)
+            for u in lista_adj[v]:
+                if u not in visitados:
+                    visitados.add(u)
+                    fila.append(u)
+        
+        return len(visitados) == grafo.vertices
+    
+    return {
+        'num_vertices': grafo.vertices,
+        'num_arestas': len(grafo.arestas),
+        'maior_grau': maior_grau,
+        'menor_grau': menor_grau,
+        'vertices_maior_grau': sorted(vertices_maior_grau),
+        'vertices_menor_grau': sorted(vertices_menor_grau),
+        'conexo': eh_conexo()
+    }
 
 # Configuração para o Render
 if __name__ == "__main__":

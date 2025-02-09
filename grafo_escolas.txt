@@ -1,6 +1,4 @@
 45
-
-45
 "EMEF Profa Geny Farah Salles" "EE Arrecieres Natai"
 "EMEF Profa Geny Farah Salles" "Colegio Jardim Alvorada"
 "EE Arrecieres Natai" "Colegio Jardim Alvorada"
