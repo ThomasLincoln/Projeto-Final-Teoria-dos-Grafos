@@ -60,10 +60,12 @@ def salvar_visualizacao(net, is_tree_view=False):
 @app.route("/")
 def index():
     global grafo_atual
+    info_grafo = calcular_info_grafo(grafo_atual) if grafo_atual else None
     return render_template(
         "index.html",
         graph_filename=session.get('graph_filename'),
-        grafo_atual=grafo_atual
+        grafo_atual=grafo_atual,
+        info_grafo=info_grafo
     )
 
 @app.route("/upload", methods=["POST"])
@@ -689,6 +691,44 @@ def encontrar_corte_especifico():
         flash(f"Erro ao encontrar corte: {str(e)}", "danger")
         return redirect(url_for("index"))
 
+def calcular_diametro(grafo):
+    """
+    Calcula o diâmetro do grafo usando o algoritmo de Floyd-Warshall
+    Retorna -1 se o grafo não for conexo
+    """
+    if not grafo or grafo.vertices == 0:
+        return -1
+        
+    # Inicializa a matriz de distâncias
+    INF = float('inf')
+    dist = [[INF] * grafo.vertices for _ in range(grafo.vertices)]
+    
+    # Distância de um vértice para ele mesmo é 0
+    for i in range(grafo.vertices):
+        dist[i][i] = 0
+    
+    # Inicializa as distâncias das arestas existentes como 1
+    for u, v in grafo.arestas:
+        dist[u][v] = 1
+        dist[v][u] = 1  # Grafo não direcionado
+    
+    # Algoritmo de Floyd-Warshall
+    for k in range(grafo.vertices):
+        for i in range(grafo.vertices):
+            for j in range(grafo.vertices):
+                if dist[i][k] != INF and dist[k][j] != INF:
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    
+    # Encontra o maior caminho mínimo (diâmetro)
+    diametro = 0
+    for i in range(grafo.vertices):
+        for j in range(grafo.vertices):
+            if dist[i][j] == INF:  # Se houver vértices desconectados
+                return -1
+            diametro = max(diametro, dist[i][j])
+    
+    return int(diametro)
+
 def calcular_info_grafo(grafo):
     """
     Calcula informações gerais sobre o grafo
@@ -730,6 +770,9 @@ def calcular_info_grafo(grafo):
         
         return len(visitados) == grafo.vertices
     
+    # Adiciona o diâmetro às informações
+    diametro = calcular_diametro(grafo)
+    
     return {
         'num_vertices': grafo.vertices,
         'num_arestas': len(grafo.arestas),
@@ -737,7 +780,8 @@ def calcular_info_grafo(grafo):
         'menor_grau': menor_grau,
         'vertices_maior_grau': sorted(vertices_maior_grau),
         'vertices_menor_grau': sorted(vertices_menor_grau),
-        'conexo': eh_conexo()
+        'conexo': eh_conexo(),
+        'diametro': diametro
     }
 
 # Configuração para o Render

@@ -222,17 +222,37 @@
   <!-- Adicione após o card de ajustes -->
   <div class="card mt-3">
     <div class="card-header bg-primary text-white">
-      <h5 class="mb-0">Quantidade de Vértices</h5>
+        <h5 class="mb-0">Informações do Grafo</h5>
     </div>
     <div class="card-body">
-      {% if grafo_atual %}
-        <h4 class="text-center">
-          Número de vértices: 
-          <span class="badge bg-success">{{ grafo_atual.vertices }}</span>
-        </h4>
-      {% else %}
-        <p class="text-center text-muted mb-0">Carregue um grafo para ver a quantidade de vértices.</p>
-      {% endif %}
+        {% if grafo_atual %}
+            <h4 class="text-center">
+                Número de vértices: 
+                <span class="badge bg-success">{{ grafo_atual.vertices }}</span>
+            </h4>
+            <h4 class="text-center mt-3">
+                Número de arestas: 
+                <span class="badge bg-success">{{ grafo_atual.arestas|length }}</span>
+            </h4>
+            <h4 class="text-center mt-3">
+                Vértice(s) de maior grau: 
+                <span class="badge bg-success">{{ info_grafo.vertices_maior_grau|join(', ') }} (Grau {{ info_grafo.maior_grau }})</span>
+            </h4>
+            <h4 class="text-center mt-3">
+                Vértice(s) de menor grau: 
+                <span class="badge bg-success">{{ info_grafo.vertices_menor_grau|join(', ') }} (Grau {{ info_grafo.menor_grau }})</span>
+            </h4>
+            <h4 class="text-center mt-3">
+                Diâmetro do grafo: 
+                {% if info_grafo.diametro >= 0 %}
+                    <span class="badge bg-success">{{ info_grafo.diametro }}</span>
+                {% else %}
+                    <span class="badge bg-danger">Grafo não conexo</span>
+                {% endif %}
+            </h4>
+        {% else %}
+            <p class="text-center text-muted mb-0">Carregue um grafo para ver suas informações.</p>
+        {% endif %}
     </div>
   </div>
 </div>
