@@ -266,6 +266,37 @@
                     <span class="badge bg-danger">Grafo não conexo</span>
                 {% endif %}
             </h4>
+            <h4 class="text-center mt-3">
+                Caminho do menor ciclo: 
+                {% if info_grafo.menor_ciclo_vertices %}
+                    <span class="badge bg-success">{{ info_grafo.menor_ciclo_vertices|join(' → ') }} → {{ info_grafo.menor_ciclo_vertices[0] }}</span>
+                {% else %}
+                    <span class="badge bg-warning">Não possui ciclos</span>
+                {% endif %}
+            </h4>
+            
+            <!-- Distribuição de Graus -->
+            <h4 class="text-center mt-4">Distribuição de Graus:</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-2">
+                    <thead class="table-success">
+                        <tr>
+                            <th class="text-center">Grau</th>
+                            <th class="text-center">Quantidade de Vértices</th>
+                            <th class="text-center">Vértices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grau, info in info_grafo.distribuicao_graus.items() %}
+                        <tr>
+                            <td class="text-center">{{ grau }}</td>
+                            <td class="text-center">{{ info.quantidade }}</td>
+                            <td class="text-center">{{ info.vertices|join(', ') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% else %}
             <p class="text-center text-muted mb-0">Carregue um grafo para ver suas informações.</p>
         {% endif %}

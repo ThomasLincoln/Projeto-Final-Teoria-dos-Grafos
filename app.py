@@ -744,6 +744,20 @@ def calcular_info_grafo(grafo):
     for v in range(grafo.vertices):
         graus[v] = len(lista_adj[v])
     
+    # Calcular distribuição de graus
+    distribuicao_graus = {}
+    for vertice, grau in graus.items():
+        if grau not in distribuicao_graus:
+            distribuicao_graus[grau] = {
+                'quantidade': 0,
+                'vertices': []
+            }
+        distribuicao_graus[grau]['quantidade'] += 1
+        distribuicao_graus[grau]['vertices'].append(mapa_reverso[vertice])
+    
+    # Ordenar a distribuição por grau
+    distribuicao_graus = dict(sorted(distribuicao_graus.items()))
+    
     # Encontrar maior e menor grau
     maior_grau = max(graus.values()) if graus else 0
     menor_grau = min(graus.values()) if graus else 0
@@ -770,8 +784,16 @@ def calcular_info_grafo(grafo):
         
         return len(visitados) == grafo.vertices
     
-    # Adiciona o diâmetro às informações
+    # Calcular diâmetro
     diametro = calcular_diametro(grafo)
+    
+    # Encontrar menor ciclo
+    menor_ciclo_info = encontrar_menor_ciclo(grafo)
+    if menor_ciclo_info:
+        menor_ciclo_tamanho, menor_ciclo = menor_ciclo_info
+        menor_ciclo_vertices = [mapa_reverso[v] for v in menor_ciclo]
+    else:
+        menor_ciclo_tamanho, menor_ciclo_vertices = None, None
     
     return {
         'num_vertices': grafo.vertices,
@@ -781,7 +803,10 @@ def calcular_info_grafo(grafo):
         'vertices_maior_grau': sorted(vertices_maior_grau),
         'vertices_menor_grau': sorted(vertices_menor_grau),
         'conexo': eh_conexo(),
-        'diametro': diametro
+        'diametro': diametro,
+        'menor_ciclo_tamanho': menor_ciclo_tamanho,
+        'menor_ciclo_vertices': menor_ciclo_vertices,
+        'distribuicao_graus': distribuicao_graus
     }
 
 @app.route("/buscar_ciclo", methods=["POST"])
@@ -866,6 +891,53 @@ def encontrar_ciclo(grafo, tamanho):
             return ciclo
             
     return None
+
+def encontrar_menor_ciclo(grafo):
+    """
+    Encontra o menor ciclo no grafo usando BFS
+    Retorna uma tupla (tamanho, ciclo) ou None se não existir ciclo
+    """
+    if not grafo or grafo.vertices < 3:
+        return None
+
+    # Gera lista de adjacência
+    lista_adj = grafo.gerar_lista_adjacencia()
+
+    menor_ciclo = None
+    menor_tamanho = float('inf')
+
+    # Para cada vértice como ponto inicial
+    for inicio in range(grafo.vertices):
+        # BFS
+        visitados = [-1] * grafo.vertices
+        pai = [-1] * grafo.vertices
+        fila = [(inicio, -1)]  # (vértice, pai)
+        
+        visitados[inicio] = 0
+        
+        while fila:
+            v, p = fila.pop(0)
+            
+            for vizinho in lista_adj[v]:
+                if visitados[vizinho] == -1:  # Não visitado
+                    visitados[vizinho] = visitados[v] + 1
+                    pai[vizinho] = v
+                    fila.append((vizinho, v))
+                elif vizinho != p and vizinho != inicio:  # Encontrou ciclo
+                    # Reconstruir o ciclo
+                    ciclo = [v]
+                    atual = v
+                    while atual != inicio:
+                        atual = pai[atual]
+                        ciclo.append(atual)
+                    ciclo.reverse()
+                    
+                    tamanho = len(ciclo)
+                    if tamanho < menor_tamanho:
+                        menor_tamanho = tamanho
+                        menor_ciclo = ciclo
+
+    return (menor_tamanho, menor_ciclo) if menor_ciclo else None
 
 # Configuração para o Render
 if __name__ == "__main__":
