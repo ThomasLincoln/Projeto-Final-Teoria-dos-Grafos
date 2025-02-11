@@ -362,8 +362,16 @@ def verificar_hamiltoniano():
     try:
         net = configurar_network()
         
-        # Verificar se é hamiltoniano
+        # Gerar lista de adjacência
         lista_adj = grafo_atual.gerar_lista_adjacencia()
+        
+        # Verificar número de vértices com grau 1
+        grau_1 = sum(1 for vizinhos in lista_adj.values() if len(vizinhos) == 1)
+        if grau_1 > 2:
+            flash("O grafo não é hamiltoniano, pois possui mais de dois vértices com grau 1.", "warning")
+            return redirect(url_for("index"))
+        
+        # Verificar se é hamiltoniano
         vertices = list(range(grafo_atual.vertices))
         caminho = []
         visitados = set()
@@ -413,6 +421,7 @@ def verificar_hamiltoniano():
     except Exception as e:
         flash(f"Erro ao verificar grafo hamiltoniano: {str(e)}", "danger")
         return redirect(url_for("index"))
+
 
 @app.route("/encontrar_menor_corte", methods=["POST"])
 def encontrar_menor_corte():
